@@ -105,7 +105,9 @@ if (process.env.UNDERSTUDY_PARENT_PID) {
     const parentWatch = setInterval(() => {
       try {
         process.kill(parentPid, 0);
-      } catch {
+      } catch (err) {
+        // EPERM means the parent exists but is owned by someone else
+        if (err && err.code === "EPERM") return;
         clearInterval(parentWatch);
         log(`parent pid ${parentPid} is gone; exiting`);
         serverGracefulShutdown(() => process.exit(0));

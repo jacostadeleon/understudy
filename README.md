@@ -16,10 +16,15 @@ Requires [Node.js](https://nodejs.org) (any recent LTS) and `claude` on PATH.
 ```sh
 git clone https://github.com/jacostadeleon/understudy.git
 cd understudy
-copy .env.example .env   # or cp, then put your key(s) in .env
-understudy.cmd           # windows: tray app + proxy, one click
-./und.sh launch          # macOS/linux: proxy + claude
+cp .env.example .env     # windows: copy .env.example .env - put your key(s) in
 ```
+
+| Windows | double-click `understudy.cmd` | built-in (PowerShell tray app) |
+| macOS | `./start-unix.sh` | status-bar icon: green/red dot, full model picker menu |
+| Linux | `./start-unix.sh` | tray icon: `pip3 install --user pystray pillow` + an AppIndicator host |
+| any, no GUI | `./start-unix.sh --headless` (keeps proxy alive; Ctrl+C stops it) | none |
+
+`start-unix.sh` also proxies `und.sh` verbs: `./start-unix.sh` behaves like `./und.sh launch` when no GUI toolkit is available.
 
 Double-clicking `understudy.cmd` (Windows) starts the proxy if needed and parks a tray icon:
 
@@ -42,7 +47,8 @@ If `selected.json` says `{"default": true}`, marker requests also pass through (
 - `selected.json` - current model pick (written by the tray; read per-request by the proxy).
 - `.env` - API keys, e.g. `UNDERSTUDY_DEEPSEEK_KEY=sk-...` (see `.env.example`).
 - `tray.ps1` - Windows system-tray controller.
-- `understudy.cmd` / `und.cmd` / `und.sh` / `launch-claude.cmd` - launchers.
+- `tray.py` - macOS status-bar / Linux tray controller (falls back to headless keeper).
+- `understudy.cmd` / `und.cmd` / `und.sh` / `start-unix.sh` / `launch-claude.cmd` - launchers.
 
 ## Endpoints (localhost only)
 
