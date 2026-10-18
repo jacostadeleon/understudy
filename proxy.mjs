@@ -98,6 +98,24 @@ function readSelected() {
 const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 32 });
 const httpsAgent = new https.Agent({ keepAlive: true, maxSockets: 32 });
 
+// die with the tray/controller that spawned us (optional, set by tray.ps1)
+if (process.env.UNDERSTUDY_PARENT_PID) {
+  const parentPid = Number(process.env.UNDERSTUDY_PARENT_PID);
+  if (parentPid > 0) {
+    const parentWatch = setInterval(() => {
+      try {
+        process.kill(parentPid, 0);
+      } catch {
+        clearInterval(parentWatch);
+        log(`parent pid ${parentPid} is gone; exiting`);
+        serverGracefulShutdown(() => process.exit(0));
+        setTimeout(() => process.exit(0), 1500).unref();
+      }
+    }, 3000);
+    parentWatch.unref?.();
+  }
+}
+
 function sysText(parsedBody) {
   const sys = parsedBody && parsedBody.system;
   if (typeof sys === "string") return sys;
@@ -325,6 +343,11 @@ function log(line) {
   console.log(`[${now}] ${line}`);
 }
 
+function serverGracefulShutdown(done) {
+  log("shutting down");
+  server.close(() => done());
+}
+
 const server = http.createServer(async (clientReq, clientRes) => {
   const startedAt = Date.now();
   try {
@@ -360,7 +383,7 @@ const server = http.createServer(async (clientReq, clientRes) => {
       });
       clientRes.end(payload, () => {
         log("shutdown requested via /shutdown");
-        server.close(() => process.exit(0));
+        serverGracefulShutdown(() => process.exit(0));
         setTimeout(() => process.exit(0), 1500).unref();
       });
       return;

@@ -91,9 +91,13 @@ function Start-Proxy {
     $script:LastError = "node.exe not found in PATH"
     return $false
   }
-  $proc = Start-Process -FilePath $found.Source `
-    -ArgumentList "`"$(Join-Path $Dir 'proxy.mjs')`"" `
-    -WindowStyle Hidden -PassThru
+  $psi = New-Object System.Diagnostics.ProcessStartInfo
+  $psi.FileName = $found.Source
+  $psi.Arguments = "`"$(Join-Path $Dir 'proxy.mjs')`""
+  $psi.UseShellExecute = $false
+  $psi.CreateNoWindow = $true
+  $psi.EnvironmentVariables["UNDERSTUDY_PARENT_PID"] = "$PID"
+  $proc = [System.Diagnostics.Process]::Start($psi)
   $script:ProxyPid = $proc.Id
   $script:AutoStarted = $true
   return $true
@@ -211,7 +215,7 @@ $miJournal = $menu.Items.Add("Show journal")
 $miRefresh = $menu.Items.Add("Refresh status")
 $miStopStart = $menu.Items.Add("Start proxy")
 $menu.Items.Add((New-Object System.Windows.Forms.ToolStripSeparator)) | Out-Null
-$miExit = $menu.Items.Add("Exit (keeps proxy running)")
+$miExit = $menu.Items.Add("Exit (stops the proxy)")
 
 function Build-ModelMenu {
   $miModels.DropDownItems.Clear()
@@ -323,6 +327,7 @@ $miJournal.Add_Click({ Show-Journal })
 $miRefresh.Add_Click({ Update-Tray -Ping })
 
 $miExit.Add_Click({
+    Stop-Proxy
     $notify.Visible = $false
     $form.Close()
     [System.Windows.Forms.Application]::Exit()
@@ -352,8 +357,9 @@ Update-Tray -Ping
 $form.SendToBack()
 [System.Windows.Forms.Application]::Run($form)
 
-# cleanup when the tray loop exits
+# cleanup when the tray loop exits: the proxy dies with the tray
 try {
+  Stop-Proxy
   $notify.Visible = $false
   $notify.Dispose()
 } catch {}
