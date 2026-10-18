@@ -1,6 +1,6 @@
 # understudy
 
-Local proxy implementing the [cameo](https://github.com/aisk/cameo) concept as one auditable, dependency-free Node script: the main Claude Code session talks to Anthropic as usual, while a designated subagent is transparently routed to a cheaper provider (DeepSeek, which speaks the Anthropic Messages API natively, so no protocol translation is needed).
+Local proxy that lets a cheap second LLM take over Claude Code's subagent work in one auditable, dependency-free Node script: the main Claude Code session talks to Anthropic as usual, while a designated subagent is transparently routed to a cheaper provider (DeepSeek, which speaks the Anthropic Messages API natively, so no protocol translation is needed).
 
 ## Threat model
 
