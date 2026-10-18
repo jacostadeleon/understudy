@@ -1,0 +1,11 @@
+# local secrets
+.env
+
+# local runtime state
+proxy.log
+.proxy.pid
+selected.json
+
+# os junk
+Thumbs.db
+.DS_Store

@@ -1,0 +1,23 @@
+{
+  "port": 8793,
+  "passthrough": {
+    "base": "https://api.anthropic.com"
+  },
+  "default_provider": "deepseek",
+  "providers": {
+    "deepseek": {
+      "base": "https://api.deepseek.com/anthropic",
+      "key": "${UNDERSTUDY_DEEPSEEK_KEY}"
+    }
+  },
+  "models": {
+    "deepseek-v4-flash[1m]": {
+      "provider": "deepseek",
+      "label": "DeepSeek Flash (1M)"
+    },
+    "deepseek-v4-pro[1m]": {
+      "provider": "deepseek",
+      "label": "DeepSeek V4 Pro (1M)"
+    }
+  }
+}
